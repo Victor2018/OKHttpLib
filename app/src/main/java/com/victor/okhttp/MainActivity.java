@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
     }
 
     private void initData () {
+        Log.e(TAG,"initData---------------------------");
         weatherPresenter = new WeatherPresenterImpl(this); //传入WeatherView
         loginPresenter = new LoginPresenterImpl(this);
         phonePresenter = new PhoneCodePresenterImpl(this);
@@ -159,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
         if (isFinishing()) return;
         loadingDialog.dismiss();
         if (data == null) {
+            Toast.makeText(getApplicationContext(), "error = " + msg, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (data.data == null) {
             Toast.makeText(getApplicationContext(), "error = " + msg, Toast.LENGTH_SHORT).show();
             return;
         }
