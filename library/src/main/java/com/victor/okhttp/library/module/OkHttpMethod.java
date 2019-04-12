@@ -8,6 +8,9 @@ import com.alibaba.fastjson.JSONException;
 import com.victor.okhttp.library.presenter.OnHttpListener;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -143,29 +146,39 @@ public abstract class OkHttpMethod<T> implements Callback{
                     //输出调试信息
                     Log.e(TAG,"repsonse url = " + httpUrl);
                     Log.e(TAG,"responseData = " + responseData);
-                    onResult(responseData,"");
+                    onResult(responseData,new IOException("sucess"));
 
                 } catch (UnsupportedCharsetException e) {
                     e.printStackTrace();
-                    onResult(null,e.getMessage());
+                    onResult(null,new IOException(e.getMessage()));
                 }
             } else {
                 //Http请求错误
-                onResult(null,"response.code() = "+ response.code());
+                onResult(null,new IOException("response.code() = "+ response.code()));
             }
         } else {
             //请求响应为空
-            onResult(null,"server no data response");
+            onResult(null,new IOException("server no data response"));
         }
     }
 
     @Override
     public void onFailure(Call call, IOException e) {
         Log.e(TAG,"onFailure()......" + e.getMessage());
-        onResult(null,e.getMessage());
+        if (e instanceof SocketTimeoutException) {
+            //判断超时异常
+            Log.e(TAG,"onFailure()......连接超时");
+        } else if (e instanceof ConnectException) {
+            ////判断连接异常，
+            Log.e(TAG,"onFailure()......连接服务器异常");
+        } else if (e instanceof UnknownHostException) {
+            ////判断连接异常，
+            Log.e(TAG,"onFailure()......未知主机异常");
+        }
+        onResult(null,e);
     }
 
-    private void onResult (final String responseData , final String msg) {
+    private void onResult (final String responseData , final IOException e) {
         MainHandler.runMainThread(new Runnable() {
             @Override
             public void run() {
@@ -177,7 +190,7 @@ public abstract class OkHttpMethod<T> implements Callback{
                             mListener.onSuccess(parseObject(responseData,mClass));
                         }
                     } else {
-                        mListener.onError(msg);
+                        mListener.onError(e);
                     }
                 }
             }

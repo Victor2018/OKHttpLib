@@ -12,7 +12,9 @@ package com.victor.okhttp.library.presenter;
  * -----------------------------------------------------------------
  */
 
+import java.io.IOException;
+
 public interface OnHttpListener<T> {
     void onSuccess(T data);
-    void onError(String error);
+    void onError(IOException error);
 }
