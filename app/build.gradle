@@ -27,7 +27,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation project(':library')
+//    implementation 'com.github.Victor2018:OKHttpLib:v1.3'
 
     implementation 'com.squareup.okhttp3:okhttp:3.5.0'
     implementation 'com.alibaba:fastjson:1.1.56.android'
+
 }
