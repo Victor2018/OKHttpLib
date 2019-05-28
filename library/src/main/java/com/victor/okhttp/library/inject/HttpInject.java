@@ -32,7 +32,7 @@ public class HttpInject {
                 if (httpParms != null) {
                     HttpRequest.getInstance().setRequestMethod(httpParms.method());
                     HttpRequest.getInstance().setBodyContentType(httpParms.bodyContentType());
-                    HttpRequest.getInstance().setResponseCls(httpParms.responseCls());
+//                    HttpRequest.getInstance().setResponseCls(httpParms.responseCls());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

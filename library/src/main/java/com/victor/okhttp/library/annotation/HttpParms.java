@@ -22,5 +22,4 @@ import java.lang.annotation.Target;
 public @interface HttpParms {
     int method() default -1;
     String bodyContentType() default HttpRequest.mDefaultBodyContentType;
-    Class responseCls();
 }
