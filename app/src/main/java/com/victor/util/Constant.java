@@ -1,0 +1,1 @@
+package com.victor.util;/** * Created by victor on 2015/12/25. */public class Constant {    public static class Action {        public static final int SSL_ACTION                 = 1;    }}

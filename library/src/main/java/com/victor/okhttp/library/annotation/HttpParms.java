@@ -7,6 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.net.ssl.SSLSocketFactory;
+
 /*
  * -----------------------------------------------------------------
  * Copyright (C) 2018-2028, by Victor, All rights reserved.
@@ -22,4 +24,6 @@ import java.lang.annotation.Target;
 public @interface HttpParms {
     int method() default -1;
     String bodyContentType() default HttpRequest.mDefaultBodyContentType;
+    String clientPriKey() default "";
+    String trustStorePubKey() default "";
 }

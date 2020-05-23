@@ -11,6 +11,8 @@ import com.victor.okhttp.library.presenter.OnHttpListener;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLSocketFactory;
+
 import okhttp3.OkHttpClient;
 
 /*
@@ -58,30 +60,38 @@ public class OkHttpRequest {
         return mOkHttpRequest;
     }
 
-    public static OkHttpClient getOkHttpClient() {
+    public static OkHttpClient getOkHttpClient(SSLSocketFactory sslSocketFactory) {
         if (okHttpClient == null) {
             synchronized (OkHttpClient.class) {
                 if (okHttpClient == null) {
-                    okHttpClient = new OkHttpClient.Builder()
-                            .connectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.SECONDS)
+                    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                    builder.connectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.SECONDS)
                             .readTimeout(READ_TIMEOUT_MILLIS, TimeUnit.SECONDS)
-                            .writeTimeout(WRITE_TIMEOUT_MILLIS, TimeUnit.SECONDS)
-                            //.addNetworkInterceptor(new HttpUtils.RetryInterceptor())
-                            .build();
+                            .writeTimeout(WRITE_TIMEOUT_MILLIS, TimeUnit.SECONDS);
+                    if (sslSocketFactory != null) {
+                        builder.sslSocketFactory(sslSocketFactory)
+                                .hostnameVerifier(new UnSafeHostnameVerifier());//添加hostName验证器
+                    }
+                    okHttpClient = builder.build();
                 }
             }
         }
         return okHttpClient;
     }
 
-    public <T> OkHttpMethod<T> sendGetRequest (String url, HashMap<String,String> headers, String parm, Class<T> clazz, OnHttpListener<T> listener) {
-        OkHttpGetRequest<T> request = new OkHttpGetRequest<T>(url,headers,parm,clazz,getOkHttpClient(),listener);
+    public <T> OkHttpMethod<T> sendGetRequest (String url, HashMap<String,String> headers, String parm,
+                                               Class<T> clazz,SSLSocketFactory sslSocketFactory,
+                                               OnHttpListener<T> listener) {
+        OkHttpGetRequest<T> request = new OkHttpGetRequest<T>(url,headers,parm,clazz,
+                getOkHttpClient(sslSocketFactory),listener);
         return request;
     }
-    public <T> OkHttpMethod<T> sendPostRequest (String url, HashMap<String,String> headers, String parm, String bodyContentType,
-                                                Class<T> clazz, OnHttpListener<T> listener) {
+    public <T> OkHttpMethod<T> sendPostRequest (String url, HashMap<String,String> headers,
+                                                String parm, String bodyContentType,
+                                                Class<T> clazz,SSLSocketFactory sslSocketFactory, OnHttpListener<T> listener) {
 
-        OkHttpPostRequest<T> request = new OkHttpPostRequest<T>(url,headers,parm,bodyContentType,clazz,getOkHttpClient(),listener);
+        OkHttpPostRequest<T> request = new OkHttpPostRequest<T>(url,headers,parm,bodyContentType,
+                clazz,getOkHttpClient(sslSocketFactory),listener);
         return request;
     }
 
@@ -92,9 +102,10 @@ public class OkHttpRequest {
         OkHttpMethod<T> request = null;
         if (httpParm.requestMethod == Request.POST) {
             request = sendPostRequest(httpParm.url,httpParm.headers,httpParm.jsonParm,
-                    httpParm.bodyContentType,httpParm.responseCls,listener);
+                    httpParm.bodyContentType,httpParm.responseCls,httpParm.sslSocketFactory,listener);
         } else if (httpParm.requestMethod == Request.GET) {
-            request = sendGetRequest(httpParm.url,httpParm.headers,httpParm.jsonParm,httpParm.responseCls,listener);
+            request = sendGetRequest(httpParm.url,httpParm.headers,httpParm.jsonParm,
+                    httpParm.responseCls,httpParm.sslSocketFactory,listener);
         }
         request.sendRequest();
         return request;
@@ -104,7 +115,7 @@ public class OkHttpRequest {
         Log.e(TAG,"request url = " + url);
         Log.e(TAG,"request parm = " + JSON.toJSONString(upLoadParm));
         OkHttpPostImgRequest<T> request = new OkHttpPostImgRequest<T>(url,upLoadParm.responseCls,upLoadParm,
-                getOkHttpClient(),listener);
+                getOkHttpClient(upLoadParm.sslSocketFactory),listener);
         request.sendRequest();
         return request;
     }

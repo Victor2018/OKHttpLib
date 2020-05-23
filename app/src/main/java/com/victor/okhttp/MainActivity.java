@@ -24,15 +24,19 @@ import com.victor.okhttp.library.data.FormImage;
 import com.victor.okhttp.library.data.UpLoadParm;
 import com.victor.okhttp.library.inject.ViewInject;
 import com.victor.okhttp.library.presenter.HttpPresenter;
+import com.victor.presenter.GankBannerPresenterImpl;
 import com.victor.presenter.HeaderPresenterImpl;
 import com.victor.presenter.LoginPresenterImpl;
 import com.victor.presenter.PhoneCodePresenterImpl;
+import com.victor.presenter.RailWayPresenterImpl;
 import com.victor.presenter.UploadPresenterImpl;
 import com.victor.presenter.WeatherPresenterImpl;
 import com.victor.presenter.YoutubePresenterImpl;
+import com.victor.view.GankBannerView;
 import com.victor.view.HeaderView;
 import com.victor.view.LoginView;
 import com.victor.view.PhoneCodeView;
+import com.victor.view.RailwayView;
 import com.victor.view.UploadView;
 import com.victor.view.WeatherView;
 import com.victor.view.YoutubeView;
@@ -53,7 +57,8 @@ import java.util.List;
  */
 
 public class MainActivity extends AppCompatActivity implements WeatherView<Weather>, LoginView<LoginReq>,
-        PhoneCodeView<PhoneCodeReq>, UploadView<UploadReq>, HeaderView<LoginReq>, YoutubeView<String> {
+        PhoneCodeView<PhoneCodeReq>, UploadView<UploadReq>, HeaderView<LoginReq>, YoutubeView<String>,
+        GankBannerView<String>, RailwayView<String> {
     private String TAG = "MainActivity";
 
     @BindView(R.id.tv_result)
@@ -65,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
     private HttpPresenter uploadFilePresenter;
     private HttpPresenter headerPresenter;
     private HttpPresenter youtubePresenter;
+    private GankBannerPresenterImpl gankBannerPresenter;
+    private RailWayPresenterImpl railWayPresenter;
     private Dialog loadingDialog;
 
     @Override
@@ -87,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
         uploadFilePresenter = new UploadPresenterImpl(this);
         headerPresenter = new HeaderPresenterImpl(this);
         youtubePresenter = new YoutubePresenterImpl(this);
+        gankBannerPresenter = new GankBannerPresenterImpl(this);
+        railWayPresenter = new RailWayPresenterImpl(this);
         loadingDialog = new ProgressDialog(this);
         loadingDialog.setTitle("加载中...");
     }
@@ -127,9 +136,12 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
 //        uploadImg2();
 
 //        sendYoutubeRequest();
-        sendPhoneCode();
+//        sendPhoneCode();
 //        sendHeaderRequest();
 //        weatherPresenter.sendRequest("http://www.weather.com.cn/data/sk/101280601.html",null,mEtCityNo.getText().toString().trim());
+
+        sendGankBannerRequest();
+//        sendRailwayRequest();
     }
 
     @Override
@@ -247,6 +259,15 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
         return header;
     }
 
+    private void sendGankBannerRequest () {
+        String url = "https://gank.io/api/v2/banners";
+        gankBannerPresenter.sendRequest(url,null,null);
+    }
+    private void sendRailwayRequest () {
+        String url = "https://www.12306.cn/index/";
+        railWayPresenter.sendRequest(url,null,null);
+    }
+
     @Override
     public void OnUpload(UploadReq data, String msg) {
         if (isFinishing()) return;
@@ -272,6 +293,22 @@ public class MainActivity extends AppCompatActivity implements WeatherView<Weath
         if (isFinishing()) return;
         loadingDialog.dismiss();
         Log.e(TAG,"OnYoutube-data = " + data);
+        mTvResult.setText(JSON.toJSONString(data));
+    }
+
+    @Override
+    public void OnGankBanner(String data, String msg) {
+        if (isFinishing()) return;
+        loadingDialog.dismiss();
+        Log.e(TAG,"OnGankBanner-data = " + data);
+        mTvResult.setText(JSON.toJSONString(data));
+    }
+
+    @Override
+    public void OnRailway(String data, String msg) {
+        if (isFinishing()) return;
+        loadingDialog.dismiss();
+        Log.e(TAG,"OnRailway-data = " + data);
         mTvResult.setText(JSON.toJSONString(data));
     }
 }

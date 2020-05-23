@@ -5,6 +5,8 @@ import com.victor.okhttp.library.module.HttpRequest;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.net.ssl.SSLSocketFactory;
+
 /*
  * -----------------------------------------------------------------
  * Copyright (C) 2018-2028, by Victor, All rights reserved.
@@ -16,6 +18,7 @@ import java.util.List;
  * -----------------------------------------------------------------
  */
 public class HttpParm <T> {
+    public SSLSocketFactory sslSocketFactory;
     public int requestMethod = Request.GET;
     public String bodyContentType = HttpRequest.mDefaultBodyContentType;
     public Class responseCls;//响应数据

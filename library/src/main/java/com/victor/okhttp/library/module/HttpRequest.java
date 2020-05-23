@@ -1,5 +1,6 @@
 package com.victor.okhttp.library.module;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.victor.okhttp.library.data.HttpParm;
@@ -8,6 +9,8 @@ import com.victor.okhttp.library.data.UpLoadParm;
 import com.victor.okhttp.library.presenter.OnHttpListener;
 
 import java.util.HashMap;
+
+import javax.net.ssl.SSLSocketFactory;
 
 /*
  * -----------------------------------------------------------------
@@ -28,6 +31,7 @@ public class HttpRequest {
     public final static String mDefaultBodyContentType = "application/x-www-form-urlencoded; charset=";
     public final static String mJsonBodyContentType = "application/json; charset=";
     private String mBodyContentType = mDefaultBodyContentType;
+    private SSLSocketFactory mSSLSocketFactory;
     public final static String userAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36";
 
     public final static String character = "utf-8";
@@ -63,6 +67,17 @@ public class HttpRequest {
     }
 
     /**
+     * 设置https证书
+     * @param clientPriKey
+     * @param trustStorePubKey
+     */
+    public void setSSLSocketFactory (String clientPriKey,String trustStorePubKey) {
+        if (!TextUtils.isEmpty(clientPriKey) && !TextUtils.isEmpty(trustStorePubKey)) {
+            mSSLSocketFactory = SSLHelper.getSSLCertifcation(clientPriKey,trustStorePubKey);
+        }
+    }
+
+    /**
      * 设置返回数据模型
      * @param cls
      */
@@ -74,6 +89,7 @@ public class HttpRequest {
                                  String parm, OnHttpListener<T> httpListener) {
         Log.e(TAG,"sendRequest()......");
         HttpParm httpParams = new HttpParm();
+        httpParams.sslSocketFactory = mSSLSocketFactory;
         httpParams.requestMethod = requestMethod;
         httpParams.responseCls = responseCls;
         httpParams.bodyContentType = mBodyContentType;
@@ -83,8 +99,10 @@ public class HttpRequest {
         OkHttpRequest.getInstance().sendRequest(httpParams,httpListener);
     }
 
-    public <T> void sendMultipartUploadRequest (String url, UpLoadParm parm, OnHttpListener<T> httpListener) {
+    public <T> void sendMultipartUploadRequest (String url, UpLoadParm parm,
+                                                OnHttpListener<T> httpListener) {
         Log.e(TAG, "sendMultipartUploadRequest()......");
+        parm.sslSocketFactory = mSSLSocketFactory;
         parm.responseCls = responseCls;
         OkHttpRequest.getInstance().sendMultipartUploadRequest(url,parm, httpListener);
     }

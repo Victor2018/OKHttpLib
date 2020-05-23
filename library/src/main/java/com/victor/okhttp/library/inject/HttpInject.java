@@ -33,6 +33,7 @@ public class HttpInject {
                     HttpRequest.getInstance().setRequestMethod(httpParms.method());
                     HttpRequest.getInstance().setBodyContentType(httpParms.bodyContentType());
 //                    HttpRequest.getInstance().setResponseCls(httpParms.responseCls());
+                    HttpRequest.getInstance().setSSLSocketFactory(httpParms.clientPriKey(),httpParms.trustStorePubKey());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
